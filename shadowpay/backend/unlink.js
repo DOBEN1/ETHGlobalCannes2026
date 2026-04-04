@@ -70,7 +70,7 @@ export async function runPayroll(transfers, token) {
   try {
   const employer = getEmployerClient();
 
-  const result1 = await unlink.deposit({
+  const result1 = await employer.deposit({
     token: token,
     // TODO: Deposit exact amount
     amount: "10",

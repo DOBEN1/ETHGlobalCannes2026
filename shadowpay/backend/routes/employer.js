@@ -62,14 +62,16 @@ router.post("/employees", async (req, res) => {
 router.post("/payroll", async (req, res) => {
   const { token = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" } = req.body; // USDC on Base
   const employees = getEmployees();
-  console.log("Employees:" + employees)
+  console.log("Employees:")
+  console.log(employees)
 
   const transfers = employees.map((e) => ({
     employeeIndex: e.unlinkIndex,
     amount: e.salary,
   }));
 
-  console.log("transfers:" + transfers)
+  console.log("transfers:")
+  console.log(transfers)
 
   const result = await runPayroll(transfers, token);
 
