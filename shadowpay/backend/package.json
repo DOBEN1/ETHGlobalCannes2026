@@ -1,0 +1,16 @@
+{
+  "name": "shadowpay-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "@unlink-xyz/sdk": "0.0.2-canary.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "viem": "^2.47.6"
+  }
+}
