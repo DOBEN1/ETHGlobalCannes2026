@@ -8,7 +8,7 @@
     "postinstall": "node scripts/patch-blakejs.mjs"
   },
   "dependencies": {
-    "@unlink-xyz/sdk": "0.0.2-canary.0",
+    "@unlink-xyz/sdk": "0.0.1",
     "@zk-kit/eddsa-poseidon": "^1.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
