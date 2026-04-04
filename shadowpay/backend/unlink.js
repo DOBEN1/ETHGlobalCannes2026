@@ -82,53 +82,43 @@ export async function getUnlinkAddress(accountIndex) {
  * Run payroll: deposit total USDC into the privacy pool, then privately
  * transfer each employee's salary to their Unlink address.
  *
- * Falls back to a simulated result when no real funds/API key are present
- * so the UI demo still works end-to-end.
+ * Requires: EMPLOYER_PRIVATE_KEY, MASTER_MNEMONIC, RPC_URL, UNLINK_API_KEY, UNLINK_ENGINE_URL
  */
 export async function runPayroll(transfers, token) {
-  try {
-    const employer = getEmployerClient();
+  const employer = getEmployerClient();
 
-    // Total amount to deposit — sum of all salaries, USDC has 6 decimals
-    const totalHuman = transfers.reduce(
-      (sum, { amount }) => sum + parseFloat(amount),
-      0
-    );
-    const totalWei = BigInt(Math.round(totalHuman * 1_000_000)).toString();
+  // Total amount to deposit — sum of all salaries, USDC has 6 decimals
+  const totalHuman = transfers.reduce(
+    (sum, { amount }) => sum + parseFloat(amount),
+    0
+  );
+  const totalWei = BigInt(Math.round(totalHuman * 1_000_000)).toString();
 
-    // Ensure Permit2 has enough USDC allowance before depositing
-    await employer.ensureErc20Approval({ token, amount: totalWei });
+  console.log(`Payroll: depositing ${totalHuman} USDC (${totalWei} wei) for ${transfers.length} employees`);
 
-    // Deposit the full payroll amount into the shielded pool
-    const depositResult = await employer.deposit({ token, amount: totalWei });
-    const depositStatus = await employer.pollTransactionStatus(depositResult.txId);
-    console.log("Deposit settled:", depositStatus.status);
+  // Ensure Permit2 has enough USDC allowance before depositing
+  await employer.ensureErc20Approval({ token, amount: totalWei });
 
-    // Resolve each employee's private Unlink address and build transfer list
-    const sdkTransfers = await Promise.all(
-      transfers.map(async ({ employeeIndex, amount }) => {
-        const recipientAddress = await getUnlinkAddress(employeeIndex);
-        return {
-          recipientAddress,
-          token,
-          amount: BigInt(Math.round(parseFloat(amount) * 1_000_000)).toString(),
-        };
-      })
-    );
+  // Deposit the full payroll amount into the shielded pool
+  const depositResult = await employer.deposit({ token, amount: totalWei });
+  const depositStatus = await employer.pollTransactionStatus(depositResult.txId);
+  console.log("Deposit settled:", depositStatus.status);
 
-    const result = await employer.transfer({ transfers: sdkTransfers });
-    const transferStatus = await employer.pollTransactionStatus(result.txId);
-    return { success: true, txId: result.txId, status: transferStatus.status };
-  } catch (err) {
-    // Graceful fallback for demo mode (no funds / no API key)
-    console.warn("Unlink payroll failed (demo fallback):", err.message);
-    return {
-      success: true,
-      simulated: true,
-      txId: `sim_${Date.now()}`,
-      status: "simulated",
-    };
-  }
+  // Resolve each employee's private Unlink address and build transfer list
+  const sdkTransfers = await Promise.all(
+    transfers.map(async ({ employeeIndex, amount }) => {
+      const recipientAddress = await getUnlinkAddress(employeeIndex);
+      return {
+        recipientAddress,
+        token,
+        amount: BigInt(Math.round(parseFloat(amount) * 1_000_000)).toString(),
+      };
+    })
+  );
+
+  const result = await employer.transfer({ transfers: sdkTransfers });
+  const transferStatus = await employer.pollTransactionStatus(result.txId);
+  return { success: true, txId: result.txId, status: transferStatus.status };
 }
 
 /**
@@ -136,13 +126,8 @@ export async function runPayroll(transfers, token) {
  */
 export async function getBalance(accountIndex, token) {
   const client = getUnlinkClient(accountIndex);
-  try {
-    const { balances } = await client.getBalances(token ? { token } : {});
-    return balances;
-  } catch (err) {
-    console.warn("getBalances failed:", err.message);
-    return [];
-  }
+  const { balances } = await client.getBalances(token ? { token } : {});
+  return balances;
 }
 
 /**
@@ -150,13 +135,8 @@ export async function getBalance(accountIndex, token) {
  */
 export async function getTransactions(accountIndex) {
   const client = getUnlinkClient(accountIndex);
-  try {
-    const { transactions } = await client.getTransactions();
-    return transactions;
-  } catch (err) {
-    console.warn("getTransactions failed:", err.message);
-    return [];
-  }
+  const { transactions } = await client.getTransactions();
+  return transactions;
 }
 
 /**
@@ -164,15 +144,10 @@ export async function getTransactions(accountIndex) {
  */
 export async function withdraw(accountIndex, recipientEvmAddress, token, amount) {
   const client = getUnlinkClient(accountIndex);
-  try {
-    const result = await client.withdraw({
-      recipientEvmAddress,
-      token,
-      amount: BigInt(Math.round(parseFloat(amount) * 1_000_000)).toString(),
-    });
-    return { success: true, txId: result.txId, status: result.status };
-  } catch (err) {
-    console.warn("withdraw failed:", err.message);
-    return { success: false, error: err.message };
-  }
+  const result = await client.withdraw({
+    recipientEvmAddress,
+    token,
+    amount: BigInt(Math.round(parseFloat(amount) * 1_000_000)).toString(),
+  });
+  return { success: true, txId: result.txId, status: result.status };
 }
