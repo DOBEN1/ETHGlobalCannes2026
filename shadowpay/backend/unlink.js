@@ -61,7 +61,20 @@ export async function getUnlinkAddress(accountIndex) {
  * For the demo we simulate the transfer so the UI flow is visible without live funds.
  */
 export async function runPayroll(transfers, token) {
+  console.log("Starting payroll function")
+  
+  try {
   const employer = getEmployerClient();
+
+  const result = await unlink.deposit({
+    token: token,
+    // TODO: Deposit exact amount
+    amount: "10",
+  });
+
+  const deposit_result = await unlink.pollTransactionStatus(result.txId);
+  console.log("Result deposit payroll function")
+  console.log(deposit_result)
 
   // Build transfer list for the SDK
   const sdkTransfers = await Promise.all(
@@ -70,13 +83,12 @@ export async function runPayroll(transfers, token) {
       return {
         recipientAddress,
         token,
-        // USDC has 6 decimals
-        amount: BigInt(Math.round(parseFloat(amount) * 1_000_000)).toString(),
+        // USDC has 6 decimals so usually it would be `* 1_000_000`
+        amount: BigInt(Math.round(parseFloat(amount))).toString(),
       };
     })
   );
 
-  try {
     const result = await employer.transfer({ transfers: sdkTransfers });
     return { success: true, txId: result.txId, status: result.status };
   } catch (err) {

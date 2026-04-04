@@ -6,7 +6,7 @@ const employees = [
     name: "Alice Chen",
     role: "Senior Engineer",
     evmAddress: "0x1111111111111111111111111111111111111111",
-    salary: "4500", // USDC per month, 6 decimals stored as human-readable
+    salary: "1", // USDC per month, 6 decimals stored as human-readable
     unlinkIndex: 1,
     password: "alice123",
   },
@@ -15,7 +15,7 @@ const employees = [
     name: "Bob Martinez",
     role: "Product Manager",
     evmAddress: "0x2222222222222222222222222222222222222222",
-    salary: "5200",
+    salary: "2",
     unlinkIndex: 2,
     password: "bob123",
   },
@@ -24,7 +24,7 @@ const employees = [
     name: "Carol Kim",
     role: "Designer",
     evmAddress: "0x3333333333333333333333333333333333333333",
-    salary: "3800",
+    salary: "3",
     unlinkIndex: 3,
     password: "carol123",
   },
