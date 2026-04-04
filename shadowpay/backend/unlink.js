@@ -7,7 +7,10 @@
  * Index N = employee N
  */
 
-import { createUnlink, unlinkAccount } from "@unlink-xyz/sdk";
+import { createUnlink, unlinkAccount, unlinkEvm } from "@unlink-xyz/sdk";
+import { createWalletClient, http } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { baseSepolia } from "viem/chains";
 
 const ENGINE_URL = process.env.UNLINK_ENGINE_URL || "https://engine.unlink.xyz";
 const API_KEY = process.env.UNLINK_API_KEY || "";
@@ -30,11 +33,21 @@ export function getUnlinkClient(accountIndex = 0) {
     accountIndex,
   });
 
+  const evmAccount = privateKeyToAccount(
+    EMPLOYER_PRIVATE_KEY,
+  );
+
+  const walletClient = createWalletClient({
+    account: evmAccount,
+    chain: baseSepolia,
+    transport: http(RPC_URL),
+  });
+
   const client = createUnlink({
     engineUrl: ENGINE_URL,
     apiKey: API_KEY,
     account,
-    // evm provider omitted — we don't do on-chain deposits in the demo
+    evm: unlinkEvm.fromViem({ walletClient })
   });
 
   clientCache.set(accountIndex, client);
@@ -66,32 +79,32 @@ export async function getUnlinkAddress(accountIndex) {
  */
 export async function runPayroll(transfers, token) {
   console.log("Starting payroll function")
-  
+
   try {
-  const employer = getEmployerClient();
+    const employer = getEmployerClient();
 
-  const result1 = await employer.deposit({
-    token: token,
-    // TODO: Deposit exact amount
-    amount: "10",
-  });
+    const result1 = await employer.deposit({
+      token: token,
+      // TODO: Deposit exact amount
+      amount: "10",
+    });
 
-  const deposit_result = await unlink.pollTransactionStatus(result1.txId);
-  console.log("Result deposit payroll function")
-  console.log(deposit_result)
+    const deposit_result = await unlink.pollTransactionStatus(result1.txId);
+    console.log("Result deposit payroll function")
+    console.log(deposit_result)
 
-  // Build transfer list for the SDK
-  const sdkTransfers = await Promise.all(
-    transfers.map(async ({ employeeIndex, amount }) => {
-      const recipientAddress = await getUnlinkAddress(employeeIndex);
-      return {
-        recipientAddress,
-        token,
-        // USDC has 6 decimals so usually it would be `* 1_000_000`
-        amount: BigInt(Math.round(parseFloat(amount))).toString(),
-      };
-    })
-  );
+    // Build transfer list for the SDK
+    const sdkTransfers = await Promise.all(
+      transfers.map(async ({ employeeIndex, amount }) => {
+        const recipientAddress = await getUnlinkAddress(employeeIndex);
+        return {
+          recipientAddress,
+          token,
+          // USDC has 6 decimals so usually it would be `* 1_000_000`
+          amount: BigInt(Math.round(parseFloat(amount))).toString(),
+        };
+      })
+    );
 
     const result = await employer.transfer({ transfers: sdkTransfers });
     return { success: true, txId: result.txId, status: result.status };
