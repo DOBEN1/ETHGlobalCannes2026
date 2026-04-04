@@ -6,7 +6,8 @@ const employees = [
     name: "Alice Chen",
     role: "Senior Engineer",
     evmAddress: "0x1111111111111111111111111111111111111111",
-    salary: "1", // USDC per month, 6 decimals stored as human-readable
+    salary: "1",// Unlink token.
+    // USDC per month, 6 decimals stored as human-readable
     unlinkIndex: 1,
     password: "alice123",
   },

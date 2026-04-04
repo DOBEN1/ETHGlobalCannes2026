@@ -62,7 +62,8 @@ router.post("/employees", async (req, res) => {
 // token defaults to USDC on Base Sepolia; override via request body for other networks
 router.post("/payroll", async (req, res) => {
   try {
-    const { token = "0x036CbD53842c5426634e7929541eC2318f3dCF7e" } = req.body; // USDC on Base Sepolia
+    const { token = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" } = req.body; // unlink token 
+    //"0x036CbD53842c5426634e7929541eC2318f3dCF7e" USDC on Base Sepolia
     const employees = getEmployees();
 
     const transfers = employees.map((e) => ({
