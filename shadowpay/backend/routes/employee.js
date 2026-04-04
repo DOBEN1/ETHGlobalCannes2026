@@ -6,6 +6,7 @@ import {
   getTransactions,
   withdraw,
 } from "../unlink.js";
+import '@zk-kit/eddsa-poseidon';
 
 const router = Router();
 
