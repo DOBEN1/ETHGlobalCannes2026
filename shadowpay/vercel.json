@@ -1,12 +1,17 @@
 {
   "version": 2,
-  "buildCommand": "npm install && cd frontend && npm install && npm run build",
-  "outputDirectory": "frontend/dist",
-  "installCommand": "echo 'skip root install'",
+  "buildCommand": "cd shadowpay/frontend && npm install && npm run build",
+  "outputDirectory": "shadowpay/frontend/dist",
+  "installCommand": "npm install",
   "functions": {
     "api/index.js": {
-      "runtime": "nodejs20.x",
-      "maxDuration": 30
+      "maxDuration": 30,
+      "includeFiles": [
+        "shadowpay/backend/**",
+        "node_modules/@zk-kit/**",
+        "node_modules/blakejs/**",
+        "node_modules/@unlink-xyz/**"
+      ]
     }
   },
   "rewrites": [
