@@ -20,14 +20,18 @@ router.use((req, res, next) => {
 
 // GET /api/employer/employees
 router.get("/employees", async (req, res) => {
+  console.log("Get employees")
   const employees = getEmployees();
   // Attach Unlink addresses (derived, not stored)
+  console.log("Get withAddresses")
   const withAddresses = await Promise.all(
     employees.map(async (e) => {
       let unlinkAddress = null;
       try {
         unlinkAddress = await getUnlinkAddress(e.unlinkIndex);
-      } catch {}
+      } catch (err) {
+        console.error('Failed to get unlink address:', err);
+      }
       return { ...e, unlinkAddress, password: undefined }; // never send password
     })
   );
@@ -50,7 +54,7 @@ router.post("/employees", async (req, res) => {
   let unlinkAddress = null;
   try {
     unlinkAddress = await getUnlinkAddress(employee.unlinkIndex);
-  } catch {}
+  } catch { }
   res.status(201).json({ ...employee, unlinkAddress, password: undefined });
 });
 
@@ -66,7 +70,7 @@ router.post("/payroll", async (req, res) => {
   }));
 
   console.log("transfers:" + transfers)
-  
+
   const result = await runPayroll(transfers, token);
 
   const run = addPayrollRun({

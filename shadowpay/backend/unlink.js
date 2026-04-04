@@ -21,8 +21,10 @@ const clientCache = new Map();
  * Deposit requires an EVM provider; transfer/withdraw/balance do not.
  */
 export function getUnlinkClient(accountIndex = 0) {
+  console.log("Create unlink client")
   if (clientCache.has(accountIndex)) return clientCache.get(accountIndex);
 
+  console.log("Create wallet from seedphrase")
   const account = unlinkAccount.fromMnemonic({
     mnemonic: MNEMONIC,
     accountIndex,
@@ -36,6 +38,7 @@ export function getUnlinkClient(accountIndex = 0) {
   });
 
   clientCache.set(accountIndex, client);
+  console.log("Created unlink client")
   return client;
 }
 
@@ -50,6 +53,7 @@ export function getEmployerClient() {
  */
 export async function getUnlinkAddress(accountIndex) {
   const client = getUnlinkClient(accountIndex);
+  console.log(client)
   return client.getAddress();
 }
 
@@ -66,13 +70,13 @@ export async function runPayroll(transfers, token) {
   try {
   const employer = getEmployerClient();
 
-  const result = await unlink.deposit({
+  const result1 = await unlink.deposit({
     token: token,
     // TODO: Deposit exact amount
     amount: "10",
   });
 
-  const deposit_result = await unlink.pollTransactionStatus(result.txId);
+  const deposit_result = await unlink.pollTransactionStatus(result1.txId);
   console.log("Result deposit payroll function")
   console.log(deposit_result)
 
