@@ -5,7 +5,8 @@
   "installCommand": "npm install",
   "functions": {
     "api/index.js": {
-      "maxDuration": 30
+      "maxDuration": 30,
+      "includeFiles": "node_modules/@zk-kit/**,node_modules/blakejs/**,node_modules/@unlink-xyz/**,shadowpay/backend/**"
     }
   },
   "rewrites": [
