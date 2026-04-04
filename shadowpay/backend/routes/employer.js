@@ -59,36 +59,35 @@ router.post("/employees", async (req, res) => {
 });
 
 // POST /api/employer/payroll
+// token defaults to USDC on Base Sepolia; override via request body for other networks
 router.post("/payroll", async (req, res) => {
-  const { token = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" } = req.body; // USDC on Base
-  const employees = getEmployees();
-  console.log("Employees:")
-  console.log(employees)
+  try {
+    const { token = "0x036CbD53842c5426634e7929541eC2318f3dCF7e" } = req.body; // USDC on Base Sepolia
+    const employees = getEmployees();
 
-  const transfers = employees.map((e) => ({
-    employeeIndex: e.unlinkIndex,
-    amount: e.salary,
-  }));
+    const transfers = employees.map((e) => ({
+      employeeIndex: e.unlinkIndex,
+      amount: e.salary,
+    }));
 
-  console.log("transfers:")
-  console.log(transfers)
+    const result = await runPayroll(transfers, token);
 
-  const result = await runPayroll(transfers, token);
+    const run = addPayrollRun({
+      id: result.txId,
+      date: new Date().toISOString(),
+      employeeCount: employees.length,
+      totalAmount: employees
+        .reduce((sum, e) => sum + parseFloat(e.salary), 0)
+        .toFixed(2),
+      status: result.status,
+      simulated: result.simulated ?? false,
+    });
 
-  const run = addPayrollRun({
-    id: result.txId,
-    date: new Date().toISOString(),
-    employeeCount: employees.length,
-    totalAmount: employees
-      .reduce((sum, e) => sum + parseFloat(e.salary), 0)
-      .toFixed(2),
-    status: result.status,
-    simulated: result.simulated ?? false,
-  });
-  console.log(run)
-  console.log(result)
-
-  res.json({ run, result });
+    res.json({ run, result });
+  } catch (err) {
+    console.error("Payroll route error:", err);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // GET /api/employer/payroll-history

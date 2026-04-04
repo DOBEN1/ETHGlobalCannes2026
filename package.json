@@ -2,6 +2,9 @@
   "name": "shadowpay-vercel",
   "version": "1.0.0",
   "type": "module",
+  "scripts": {
+    "postinstall": "node scripts/patch-blakejs.mjs"
+  },
   "engines": {
     "node": "20.x"
   },
