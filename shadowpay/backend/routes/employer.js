@@ -59,7 +59,7 @@ router.post("/employees", async (req, res) => {
 });
 
 // POST /api/employer/payroll
-// token defaults to USDC on Base Sepolia; override via request body for other networks
+// token defaults to Unlink token on Base Sepolia; override via request body for other networks
 router.post("/payroll", async (req, res) => {
   try {
     const { token = "0x7501de8ea37a21e20e6e65947d2ecab0e9f061a7" } = req.body; // unlink token 

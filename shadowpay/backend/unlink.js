@@ -79,7 +79,7 @@ export async function getUnlinkAddress(accountIndex) {
 }
 
 /**
- * Run payroll: deposit total USDC into the privacy pool, then privately
+ * Run payroll: deposit total Unlink token into the privacy pool, then privately
  * transfer each employee's salary to their Unlink address.
  *
  * Requires: EMPLOYER_PRIVATE_KEY, MASTER_MNEMONIC, RPC_URL, UNLINK_API_KEY, UNLINK_ENGINE_URL
@@ -87,16 +87,15 @@ export async function getUnlinkAddress(accountIndex) {
 export async function runPayroll(transfers, token) {
   const employer = getEmployerClient();
 
-  // Total amount to deposit — sum of all salaries, USDC has 6 decimals
   const totalHuman = transfers.reduce(
     (sum, { amount }) => sum + parseFloat(amount),
     0
   );
-  const totalWei = BigInt(Math.round(totalHuman * 1_000_000)).toString();
+  const totalWei = BigInt(Math.round(totalHuman )).toString();
 
-  console.log(`Payroll: depositing ${totalHuman} USDC (${totalWei} wei) for ${transfers.length} employees`);
+  console.log(`Payroll: depositing ${totalHuman} Unlink token (${totalWei} wei) for ${transfers.length} employees`);
 
-  // Ensure Permit2 has enough USDC allowance before depositing
+  // Ensure Permit2 has enough Unlink token allowance before depositing
   await employer.ensureErc20Approval({ token, amount: totalWei });
 
   // Deposit the full payroll amount into the shielded pool
@@ -111,7 +110,7 @@ export async function runPayroll(transfers, token) {
       return {
         recipientAddress,
         token,
-        amount: BigInt(Math.round(parseFloat(amount) * 1_000_000)).toString(),
+        amount: BigInt(Math.round(parseFloat(amount))).toString(),
       };
     })
   );
@@ -147,7 +146,7 @@ export async function withdraw(accountIndex, recipientEvmAddress, token, amount)
   const result = await client.withdraw({
     recipientEvmAddress,
     token,
-    amount: BigInt(Math.round(parseFloat(amount) * 1_000_000)).toString(),
+    amount: BigInt(Math.round(parseFloat(amount))).toString(),
   });
   return { success: true, txId: result.txId, status: result.status };
 }

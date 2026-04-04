@@ -102,7 +102,7 @@
                 <h3 class="font-semibold text-white">Run Monthly Payroll</h3>
                 <p class="text-sm text-gray-400 mt-0.5">
                   Privately transfer
-                  <span class="text-emerald-400 font-mono">${{ totalMonthlyPayroll.toLocaleString() }} USDC</span>
+                  <span class="text-emerald-400 font-mono">${{ totalMonthlyPayroll.toLocaleString() }} Unlink tokens</span>
                   to {{ employees.length }} employees via ZK proofs
                 </p>
               </div>
@@ -155,7 +155,7 @@
               <div class="flex items-start justify-between">
                 <div>
                   <p class="text-sm font-medium text-white">
-                    ${{ Number(run.totalAmount).toLocaleString() }} USDC
+                    ${{ Number(run.totalAmount).toLocaleString() }} Unlink tokens
                   </p>
                   <p class="text-xs text-gray-500 mt-0.5">
                     {{ run.employeeCount }} employees ·
@@ -227,7 +227,7 @@
             <input v-model="newEmp.role" class="input" placeholder="Software Engineer" />
           </div>
           <div>
-            <label class="block text-sm text-gray-400 mb-1">Monthly Salary (USDC) *</label>
+            <label class="block text-sm text-gray-400 mb-1">Monthly Salary (Unlink tokens) *</label>
             <input v-model="newEmp.salary" class="input" type="number" placeholder="4000" />
           </div>
           <div>

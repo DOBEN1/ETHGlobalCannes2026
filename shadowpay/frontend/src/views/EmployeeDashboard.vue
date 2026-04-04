@@ -45,7 +45,7 @@
           <p class="text-2xl font-bold text-emerald-400">
             ${{ Number(profile?.salary).toLocaleString() }}
           </p>
-          <p class="text-xs text-gray-500 mt-1">USDC / month</p>
+          <p class="text-xs text-gray-500 mt-1">Unlink tokens / month</p>
         </div>
 
         <!-- Private balance -->
@@ -56,7 +56,7 @@
             ${{ totalBalance.toLocaleString() }}
           </p>
           <p v-else class="text-2xl font-bold text-gray-600">—</p>
-          <p class="text-xs text-gray-500 mt-1">Shielded USDC</p>
+          <p class="text-xs text-gray-500 mt-1">Shielded Unlink tokens</p>
         </div>
 
         <!-- Privacy status -->
@@ -143,7 +143,7 @@
               />
             </div>
             <div>
-              <label class="block text-xs text-gray-400 mb-1">Amount (USDC)</label>
+              <label class="block text-xs text-gray-400 mb-1">Amount (Unlink tokens)</label>
               <input
                 v-model="withdrawForm.amount"
                 class="input"
@@ -221,7 +221,7 @@ const withdrawStatus = ref(null);
 const totalBalance = computed(() => {
   if (!balances.value.length) return null;
   return balances.value.reduce(
-    (sum, b) => sum + Number(b.amount) / 1_000_000,
+    (sum, b) => sum + Number(b.amount) ,
     0
   );
 });
