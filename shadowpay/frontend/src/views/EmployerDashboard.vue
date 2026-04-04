@@ -310,11 +310,13 @@ async function runPayroll() {
       body: JSON.stringify({}),
     });
     const data = await res.json();
+    if (!res.ok) {
+      payrollStatus.value = { success: false, message: `Payroll failed: ${data.error || res.statusText}` };
+      return;
+    }
     payrollStatus.value = {
       success: true,
-      message: data.run.simulated
-        ? `✓ Payroll simulated (demo mode) — tx: ${data.run.id.slice(0, 20)}…`
-        : `✓ Payroll sent — tx: ${data.run.id.slice(0, 20)}…`,
+      message: `✓ Payroll sent — tx: ${data.run.id.slice(0, 20)}…`,
     };
     await fetchHistory();
   } catch (e) {
