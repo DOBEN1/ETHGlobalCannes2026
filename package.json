@@ -9,7 +9,7 @@
     "node": "20.x"
   },
   "dependencies": {
-    "@unlink-xyz/sdk": "0.0.2-canary.0",
+    "@unlink-xyz/sdk": "0.1.0-canary.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
