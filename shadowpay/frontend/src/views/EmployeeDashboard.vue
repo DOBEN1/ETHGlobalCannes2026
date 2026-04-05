@@ -46,8 +46,8 @@
         <div class="card text-center">
           <p class="text-xs text-gray-500 mb-1 uppercase tracking-wide">Private Balance</p>
           <div v-if="loadingBalance" class="text-gray-600 text-sm py-1">Loading…</div>
-          <p v-else-if="balances.length" class="text-2xl font-bold text-white">
-            ${{ Number(balances[0]?.amount).toLocaleString() }}
+          <p v-else-if="balances.balances.length" class="text-2xl font-bold text-white">
+            ${{ Number(balances.balances[0]?.amount).toLocaleString() }}
           </p>
           <p v-else class="text-2xl font-bold text-gray-600">—</p>
           <p class="text-xs text-gray-500 mt-1">Shielded USDC</p>
