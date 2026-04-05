@@ -237,7 +237,7 @@ async function fetchBalance() {
   }
 }
 
-async function fetchTransactions({ retry = true } = {}) {
+async function fetchTransactions() {
   loadingTxs.value = true;
   try {
     const res = await fetch("/api/employee/transactions", {
@@ -246,11 +246,6 @@ async function fetchTransactions({ retry = true } = {}) {
     if (res.ok) {
       const data = await res.json();
       transactions.value = Array.isArray(data) ? data : [];
-      // Race condition: ensureRegistered() just completed but the engine may not
-      // have propagated the account data yet. Retry once after 3s if empty.
-      if (transactions.value.length === 0 && retry) {
-        setTimeout(() => fetchTransactions({ retry: false }), 3000);
-      }
     }
   } finally {
     loadingTxs.value = false;
@@ -304,7 +299,7 @@ function txLabel(tx) {
 
 /** Parse a transaction date regardless of field name or unix-vs-ISO format. */
 function formatTxDate(tx) {
-  const raw = tx.created_at ?? tx.createdAt ?? tx.timestamp ?? tx.created ?? tx.submitted_at;
+  const raw = tx.date ?? tx.created_at ?? tx.createdAt ?? tx.timestamp ?? tx.created ?? tx.submitted_at;
   if (!raw) return "—";
   const d = typeof raw === "number" ? new Date(raw * 1000) : new Date(raw);
   return isNaN(d.getTime()) ? "—" : d.toLocaleString();

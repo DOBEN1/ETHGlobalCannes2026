@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getEmployeeByPassword } from "../store.js";
+import { getEmployeeByPassword, getEmployeeTransactions } from "../store.js";
 import {
   getUnlinkAddress,
   getBalance,
@@ -50,23 +50,29 @@ router.get("/balance", async (req, res) => {
 });
 
 // GET /api/employee/transactions
+// Primary source: our own store (recorded when employer runs payroll).
+// Secondary: Unlink engine (for self-initiated txs like withdrawals).
 router.get("/transactions", async (req, res) => {
   const employee = getAuthenticatedEmployee(req);
   if (!employee) return res.status(401).json({ error: "Unauthorized" });
+
+  // Our store — always available, includes incoming salary transfers.
+  const stored = getEmployeeTransactions(employee.unlinkIndex);
+  const storedIds = new Set(stored.map((t) => t.id));
+
+  // Engine — only returns self-initiated txs (withdrawals). Merge without dupes.
+  let engineTxs = [];
   try {
-    const transactions = await getTransactions(employee.unlinkIndex);
-    // Log the raw first transaction so we can see actual field names in Vercel logs
-    if (Array.isArray(transactions) && transactions.length > 0) {
-      console.log("tx[0] raw keys:", Object.keys(transactions[0]));
-      console.log("tx[0] sample:", JSON.stringify(transactions[0]));
-    } else {
-      console.log("transactions: empty for index", employee.unlinkIndex);
+    const raw = await getTransactions(employee.unlinkIndex);
+    if (Array.isArray(raw) && raw.length > 0) {
+      console.log("engine tx[0] keys:", Object.keys(raw[0]));
     }
-    res.json(transactions);
+    engineTxs = (Array.isArray(raw) ? raw : []).filter((t) => !storedIds.has(t.id));
   } catch (err) {
-    console.error("transactions error:", err.message);
-    res.status(500).json({ error: err.message });
+    console.error("engine transactions error:", err.message);
   }
+
+  res.json([...stored, ...engineTxs]);
 });
 
 // POST /api/employee/withdraw

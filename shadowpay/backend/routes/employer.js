@@ -4,6 +4,7 @@ import {
   addEmployee,
   getPayrollRuns,
   addPayrollRun,
+  recordEmployeeTransaction,
 } from "../store.js";
 import { getUnlinkAddress, runPayroll, getTransactions } from "../unlink.js";
 
@@ -72,16 +73,29 @@ router.post("/payroll", async (req, res) => {
 
     const result = await runPayroll(transfers, token);
 
+    const now = new Date().toISOString();
     const run = addPayrollRun({
       id: result.txId,
-      date: new Date().toISOString(),
+      date: now,
       employeeCount: employees.length,
       totalAmount: employees
         .reduce((sum, e) => sum + parseFloat(e.salary), 0)
         .toFixed(2),
       status: result.status,
-      simulated: result.simulated ?? false,
     });
+
+    // Record a transaction for each employee so their dashboard shows it.
+    // The Unlink engine only returns self-initiated txs; incoming transfers
+    // don't appear in employee transaction history via the API.
+    for (const e of employees) {
+      recordEmployeeTransaction(e.unlinkIndex, {
+        id: `${result.txId}-${e.unlinkIndex}`,
+        type: "transfer",
+        amount: e.salary,
+        status: result.status,
+        date: now,
+      });
+    }
 
     res.json({ run, result });
   } catch (err) {

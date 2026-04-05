@@ -6,7 +6,7 @@ const employees = [
     name: "Alice Chen",
     role: "Senior Engineer",
     evmAddress: "0x05ffD2C103d57Bcef49596DF6BEE1C30a2e6D88c",
-    salary: "1", // Unlink token per month
+    salary: "1",
     unlinkIndex: 1,
     password: "alice123",
   },
@@ -34,17 +34,14 @@ let nextEmployeeId = 4;
 
 const payrollRuns = [];
 
-export function getEmployees() {
-  return employees;
-}
+// Per-employee transaction log. The Unlink engine's /users/{addr}/transactions
+// endpoint only returns transactions INITIATED by that user (e.g. withdrawals).
+// Incoming private transfers don't appear there, so we track them ourselves.
+const employeeTxLog = new Map(); // unlinkIndex → tx[]
 
-export function getEmployee(id) {
-  return employees.find((e) => e.id === id) ?? null;
-}
-
-export function getEmployeeByPassword(password) {
-  return employees.find((e) => e.password === password) ?? null;
-}
+export function getEmployees() { return employees; }
+export function getEmployee(id) { return employees.find((e) => e.id === id) ?? null; }
+export function getEmployeeByPassword(p) { return employees.find((e) => e.password === p) ?? null; }
 
 export function addEmployee(data) {
   const employee = {
@@ -53,18 +50,25 @@ export function addEmployee(data) {
     role: data.role,
     evmAddress: data.evmAddress,
     salary: data.salary,
-    unlinkIndex: nextEmployeeId - 1, // same as id for simplicity
+    unlinkIndex: nextEmployeeId - 1,
     password: data.password,
   };
   employees.push(employee);
   return employee;
 }
 
-export function getPayrollRuns() {
-  return payrollRuns;
-}
+export function getPayrollRuns() { return payrollRuns; }
 
 export function addPayrollRun(run) {
   payrollRuns.unshift(run);
   return run;
+}
+
+export function recordEmployeeTransaction(unlinkIndex, tx) {
+  if (!employeeTxLog.has(unlinkIndex)) employeeTxLog.set(unlinkIndex, []);
+  employeeTxLog.get(unlinkIndex).unshift(tx);
+}
+
+export function getEmployeeTransactions(unlinkIndex) {
+  return employeeTxLog.get(unlinkIndex) ?? [];
 }
