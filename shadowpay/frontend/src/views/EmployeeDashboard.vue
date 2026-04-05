@@ -172,7 +172,10 @@ async function fetchBalance() {
     const res = await fetch("/api/employee/balance", {
       headers: auth.employeeHeaders(),
     });
-      if (res.ok)   balances.value =  await res.json()
+    console.log(res)
+    let data =await res.json()
+    console.log(data)
+    if (res.ok) balances.value = data
   } finally {
     loadingBalance.value = false;
   }
