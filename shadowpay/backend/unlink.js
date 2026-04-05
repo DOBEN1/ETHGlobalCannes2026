@@ -103,19 +103,20 @@ export async function runPayroll(transfers, token) {
   const depositStatus = await employer.pollTransactionStatus(depositResult.txId);
   console.log("Deposit settled:", depositStatus.status);
 
-  // Resolve each employee's private Unlink address and build transfer list
+  // Resolve each employee's private Unlink address and build transfer list.
+  // Note: token must be passed at the TOP LEVEL of transfer(), not inside individual
+  // transfer objects — normalizeTransfers() reads params.token, not t.token.
   const sdkTransfers = await Promise.all(
     transfers.map(async ({ employeeIndex, amount }) => {
       const recipientAddress = await getUnlinkAddress(employeeIndex);
       return {
         recipientAddress,
-        token,
         amount: BigInt(Math.round(parseFloat(amount))).toString(),
       };
     })
   );
 
-  const result = await employer.transfer({ transfers: sdkTransfers });
+  const result = await employer.transfer({ transfers: sdkTransfers, token });
   const transferStatus = await employer.pollTransactionStatus(result.txId);
   return { success: true, txId: result.txId, status: transferStatus.status };
 }
@@ -125,8 +126,7 @@ export async function runPayroll(transfers, token) {
  */
 export async function getBalance(accountIndex, token) {
   const client = getUnlinkClient(accountIndex);
-  const { balances } = await client.getBalances(token ? { token } : {});
-  return balances;
+  return client.getBalances(token ? { token } : {});
 }
 
 /**
@@ -134,8 +134,7 @@ export async function getBalance(accountIndex, token) {
  */
 export async function getTransactions(accountIndex) {
   const client = getUnlinkClient(accountIndex);
-  const { transactions } = await client.getTransactions();
-  return transactions;
+  return client.getTransactions();
 }
 
 /**
