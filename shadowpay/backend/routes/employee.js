@@ -24,7 +24,7 @@ router.get("/me", async (req, res) => {
   let unlinkAddress = null;
   try {
     unlinkAddress = await getUnlinkAddress(employee.unlinkIndex);
-  } catch {}
+  } catch { }
 
   res.json({
     id: employee.id,
@@ -41,7 +41,7 @@ router.get("/balance", async (req, res) => {
   const employee = getAuthenticatedEmployee(req);
   if (!employee) return res.status(401).json({ error: "Unauthorized" });
   try {
-    const balances = await getBalance(employee.unlinkIndex);
+    const balances = await getBalance(employee.unlinkIndex, "0xC1a5D4E99BB224713dd179eA9CA2Fa6600706210");
     res.json(balances);
   } catch (err) {
     console.error("balance error:", err.message);
@@ -50,15 +50,15 @@ router.get("/balance", async (req, res) => {
 });
 
 // GET /api/employee/transactions
-// Primary source: our own store (recorded when employer runs payroll).
 // Secondary: Unlink engine (for self-initiated txs like withdrawals).
 router.get("/transactions", async (req, res) => {
   const employee = getAuthenticatedEmployee(req);
   if (!employee) return res.status(401).json({ error: "Unauthorized" });
 
-  // Our store — always available, includes incoming salary transfers.
-  const stored = getEmployeeTransactions(employee.unlinkIndex);
-  const storedIds = new Set(stored.map((t) => t.id));
+  // Primary source: our own store (recorded when employer runs payroll).
+  // // Our store — always available, includes incoming salary transfers.
+  // const stored = getEmployeeTransactions(employee.unlinkIndex);
+  // const storedIds = new Set(stored.map((t) => t.id));
 
   // Engine — only returns self-initiated txs (withdrawals). Merge without dupes.
   let engineTxs = [];

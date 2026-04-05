@@ -56,9 +56,6 @@
                   <th class="text-left px-4 py-3 text-gray-400 font-medium">Name</th>
                   <th class="text-left px-4 py-3 text-gray-400 font-medium">Role</th>
                   <th class="text-right px-4 py-3 text-gray-400 font-medium">Salary/mo</th>
-                  <th class="text-left px-4 py-3 text-gray-400 font-medium hidden md:table-cell">
-                    Private Address
-                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -80,15 +77,6 @@
                   <td class="px-4 py-3 text-gray-400">{{ emp.role }}</td>
                   <td class="px-4 py-3 text-right font-mono text-emerald-400 font-semibold">
                     ${{ Number(emp.salary).toLocaleString() }}
-                  </td>
-                  <td class="px-4 py-3 hidden md:table-cell">
-                    <span
-                      v-if="emp.unlinkAddress"
-                      class="font-mono text-xs text-indigo-300 bg-indigo-900/30 px-2 py-0.5 rounded"
-                    >
-                      {{ emp.unlinkAddress.slice(0, 16) }}…
-                    </span>
-                    <span v-else class="text-gray-600 text-xs">—</span>
                   </td>
                 </tr>
               </tbody>
@@ -254,7 +242,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onActivated } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth.js";
 
@@ -367,6 +355,12 @@ function logout() {
 }
 
 onMounted(() => {
+  fetchEmployees();
+  fetchHistory();
+});
+
+onActivated(() => {
+  // 🔥 runs when navigating back to this page
   fetchEmployees();
   fetchHistory();
 });

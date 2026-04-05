@@ -64,53 +64,30 @@
       <div class="grid md:grid-cols-2 gap-6">
         <!-- Transaction history -->
         <div class="space-y-4">
-          <div class="flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-white">Transaction History</h2>
-            <button
-              class="text-xs text-indigo-400 hover:text-indigo-300"
-              @click="fetchTransactions"
-            >
-              Refresh
-            </button>
-          </div>
-
-          <div class="card p-0 overflow-hidden">
-            <div v-if="loadingTxs" class="p-6 text-center text-gray-500 text-sm">
-              Loading…
+          <!-- Fairness oracle teaser -->
+          <div class="card border-dashed border-gray-700 space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="text-yellow-400">📊</span>
+              <h3 class="font-semibold text-white text-sm">Fairness Oracle</h3>
+              <span class="badge badge-yellow">Coming Soon</span>
             </div>
-            <div
-              v-else-if="transactions.length === 0"
-              class="p-8 text-center text-gray-600 space-y-2"
-            >
-              <p class="text-2xl">📭</p>
-              <p class="text-sm">No transactions yet</p>
-              <p class="text-xs text-gray-700">
-                Transactions appear after your employer runs payroll
-              </p>
-            </div>
-            <div v-else class="divide-y divide-gray-800">
-              <div
-                v-for="tx in transactions"
-                :key="tx.id"
-                class="px-4 py-3 flex items-center justify-between hover:bg-gray-800/30"
-              >
-                <div class="flex items-center gap-3">
-                  <span class="text-lg">{{ txIcon(tx) }}</span>
-                  <div>
-                    <p class="text-sm font-medium text-white capitalize">{{ txLabel(tx) }}</p>
-                    <p class="text-xs text-gray-500">{{ formatTxDate(tx) }}</p>
-                  </div>
-                </div>
-                <span
-                  :class="[
-                    'badge',
-                    tx.status === 'processed' || tx.status === 'relayed' ? 'badge-green' :
-                    tx.status === 'failed' ? 'bg-red-900 text-red-300' :
-                    'badge-yellow'
-                  ]"
-                >
-                  {{ tx.status }}
-                </span>
+            <p class="text-xs text-gray-500 leading-relaxed">
+              See how your salary compares to peers in similar roles — without
+              anyone knowing exact figures. Powered by ZK range proofs over the
+              Unlink shielded pool.
+            </p>
+            <div class="space-y-2 opacity-50 pointer-events-none select-none">
+              <div class="flex items-center justify-between text-xs">
+                <span class="text-gray-400">Your percentile</span>
+                <span class="text-white font-semibold">—</span>
+              </div>
+              <div class="bg-gray-800 rounded-full h-2">
+                <div class="bg-indigo-600 h-2 rounded-full w-1/2"></div>
+              </div>
+              <div class="flex justify-between text-xs text-gray-600">
+                <span>Min</span>
+                <span>Median</span>
+                <span>Max</span>
               </div>
             </div>
           </div>
@@ -154,34 +131,6 @@
               :class="withdrawStatus.success ? 'bg-emerald-900/40 text-emerald-300' : 'bg-red-900/40 text-red-300'"
             >
               {{ withdrawStatus.message }}
-            </div>
-          </div>
-
-          <!-- Fairness oracle teaser -->
-          <div class="card border-dashed border-gray-700 space-y-3">
-            <div class="flex items-center gap-2">
-              <span class="text-yellow-400">📊</span>
-              <h3 class="font-semibold text-white text-sm">Fairness Oracle</h3>
-              <span class="badge badge-yellow">Coming Soon</span>
-            </div>
-            <p class="text-xs text-gray-500 leading-relaxed">
-              See how your salary compares to peers in similar roles — without
-              anyone knowing exact figures. Powered by ZK range proofs over the
-              Unlink shielded pool.
-            </p>
-            <div class="space-y-2 opacity-50 pointer-events-none select-none">
-              <div class="flex items-center justify-between text-xs">
-                <span class="text-gray-400">Your percentile</span>
-                <span class="text-white font-semibold">—</span>
-              </div>
-              <div class="bg-gray-800 rounded-full h-2">
-                <div class="bg-indigo-600 h-2 rounded-full w-1/2"></div>
-              </div>
-              <div class="flex justify-between text-xs text-gray-600">
-                <span>Min</span>
-                <span>Median</span>
-                <span>Max</span>
-              </div>
             </div>
           </div>
         </div>
