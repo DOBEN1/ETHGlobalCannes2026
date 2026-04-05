@@ -147,17 +147,21 @@ export async function runPayroll(transfers, token) {
 
 /**
  * Get private balance for a given account index.
+ * Ensures the account is registered before querying so the engine knows about it.
  */
 export async function getBalance(accountIndex, token) {
   const client = getUnlinkClient(accountIndex);
+  await client.ensureRegistered();
   return client.getBalances(token ? { token } : {});
 }
 
 /**
  * Get transaction history for a given account index.
+ * Ensures the account is registered first — unregistered accounts return empty.
  */
 export async function getTransactions(accountIndex) {
   const client = getUnlinkClient(accountIndex);
+  await client.ensureRegistered();
   return client.getTransactions();
 }
 

@@ -27,12 +27,6 @@
           <div>
             <h1 class="text-xl font-bold text-white">{{ profile?.name }}</h1>
             <p class="text-gray-400 text-sm">{{ profile?.role }}</p>
-            <p
-              v-if="profile?.unlinkAddress"
-              class="font-mono text-xs text-indigo-300 mt-1"
-            >
-              {{ profile.unlinkAddress }}
-            </p>
           </div>
         </div>
       </div>
@@ -45,7 +39,7 @@
           <p class="text-2xl font-bold text-emerald-400">
             ${{ Number(profile?.salary).toLocaleString() }}
           </p>
-          <p class="text-xs text-gray-500 mt-1">Unlink tokens / month</p>
+          <p class="text-xs text-gray-500 mt-1">USDC / month</p>
         </div>
 
         <!-- Private balance -->
@@ -56,7 +50,7 @@
             ${{ totalBalance.toLocaleString() }}
           </p>
           <p v-else class="text-2xl font-bold text-gray-600">—</p>
-          <p class="text-xs text-gray-500 mt-1">Shielded Unlink tokens</p>
+          <p class="text-xs text-gray-500 mt-1">Shielded USDC</p>
         </div>
 
         <!-- Privacy status -->
@@ -132,7 +126,7 @@
           <h2 class="text-lg font-semibold text-white">Withdraw to Wallet</h2>
           <div class="card space-y-4">
             <p class="text-sm text-gray-400">
-              Move funds from your private Unlink balance to any EVM wallet.
+              Move funds from your private USDC balance to any EVM wallet.
             </p>
             <div>
               <label class="block text-xs text-gray-400 mb-1">Destination Address</label>
@@ -143,7 +137,7 @@
               />
             </div>
             <div>
-              <label class="block text-xs text-gray-400 mb-1">Amount (Unlink tokens)</label>
+              <label class="block text-xs text-gray-400 mb-1">Amount (USDC)</label>
               <input
                 v-model="withdrawForm.amount"
                 class="input"

@@ -2,10 +2,9 @@ import { Router } from "express";
 import {
   getEmployees,
   addEmployee,
-  getPayrollRuns,
   addPayrollRun,
 } from "../store.js";
-import { getUnlinkAddress, runPayroll } from "../unlink.js";
+import { getUnlinkAddress, runPayroll, getTransactions } from "../unlink.js";
 
 const router = Router();
 
@@ -91,8 +90,25 @@ router.post("/payroll", async (req, res) => {
 });
 
 // GET /api/employer/payroll-history
-router.get("/payroll-history", (req, res) => {
-  res.json(getPayrollRuns());
+// Fetch from the Unlink engine (employer index 0) so history persists across
+// serverless cold starts instead of relying on the ephemeral in-memory store.
+router.get("/payroll-history", async (req, res) => {
+  try {
+    const txs = await getTransactions(0);
+    // Map Unlink transactions to a payroll-run-like shape the UI expects
+    const runs = (Array.isArray(txs) ? txs : []).map((tx) => ({
+      id: tx.id,
+      date: tx.created_at,
+      status: tx.status,
+      type: tx.type,
+      totalAmount: tx.amount ?? "—",
+      employeeCount: "—",
+    }));
+    res.json(runs);
+  } catch (err) {
+    console.error("payroll-history error:", err.message);
+    res.json([]); // return empty list rather than crashing the UI
+  }
 });
 
 export default router;
