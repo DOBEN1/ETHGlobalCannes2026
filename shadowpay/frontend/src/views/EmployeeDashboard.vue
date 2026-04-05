@@ -241,7 +241,7 @@ async function fetchBalance() {
     const res = await fetch("/api/employee/balance", {
       headers: auth.employeeHeaders(),
     });
-    balances.value = await res.json();
+    if (res.ok) balances.value = await res.json();
   } finally {
     loadingBalance.value = false;
   }
@@ -253,7 +253,7 @@ async function fetchTransactions() {
     const res = await fetch("/api/employee/transactions", {
       headers: auth.employeeHeaders(),
     });
-    transactions.value = await res.json();
+    if (res.ok) transactions.value = await res.json();
   } finally {
     loadingTxs.value = false;
   }
@@ -272,15 +272,15 @@ async function doWithdraw() {
       }),
     });
     const data = await res.json();
-    if (data.success) {
+    if (!res.ok) {
+      withdrawStatus.value = { success: false, message: data.error || res.statusText };
+    } else {
       withdrawStatus.value = {
         success: true,
         message: `Withdrawal initiated — tx: ${data.txId}`,
       };
       withdrawForm.value = { address: "", amount: "" };
       await fetchBalance();
-    } else {
-      withdrawStatus.value = { success: false, message: data.error };
     }
   } catch (e) {
     withdrawStatus.value = { success: false, message: e.message };

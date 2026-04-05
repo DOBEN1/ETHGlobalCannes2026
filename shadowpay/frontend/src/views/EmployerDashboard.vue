@@ -282,7 +282,7 @@ async function fetchEmployees() {
     const res = await fetch("/api/employer/employees", {
       headers: auth.employerHeaders(),
     });
-    employees.value = await res.json();
+    if (res.ok) employees.value = await res.json();
   } finally {
     loadingEmployees.value = false;
   }
@@ -294,7 +294,7 @@ async function fetchHistory() {
     const res = await fetch("/api/employer/payroll-history", {
       headers: auth.employerHeaders(),
     });
-    payrollRuns.value = await res.json();
+    if (res.ok) payrollRuns.value = await res.json();
   } finally {
     loadingHistory.value = false;
   }

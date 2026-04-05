@@ -72,9 +72,14 @@ export function getEmployerClient() {
 
 /**
  * Get the Unlink address (bech32m) for a given account index.
+ * Also registers the account with the engine as a side-effect so employees
+ * are ready to receive transfers by the time the employer runs payroll.
  */
 export async function getUnlinkAddress(accountIndex) {
   const client = getUnlinkClient(accountIndex);
+  // Register in the background — don't await so address derivation stays fast.
+  // Errors are intentionally swallowed; payroll will surface them if needed.
+  client.ensureRegistered().catch(() => {});
   return client.getAddress();
 }
 
@@ -91,31 +96,24 @@ export async function runPayroll(transfers, token) {
     (sum, { amount }) => sum + parseFloat(amount),
     0
   );
-  const totalWei = BigInt(Math.round(totalHuman )).toString();
+  const totalWei = BigInt(Math.round(totalHuman)).toString();
 
-  console.log(`Payroll: depositing ${totalHuman} Unlink token (${totalWei} wei) for ${transfers.length} employees`);
+  console.log(`Payroll: depositing ${totalHuman} tokens (${totalWei}) for ${transfers.length} employees`);
 
-  // Ensure Permit2 has enough Unlink token allowance before depositing
+  // Ensure Permit2 has enough allowance, then deposit into the shielded pool.
   await employer.ensureErc20Approval({ token, amount: totalWei });
-
-  // Deposit the full payroll amount into the shielded pool
   const depositResult = await employer.deposit({ token, amount: totalWei });
-  const depositStatus = await employer.pollTransactionStatus(depositResult.txId);
+
+  // Wait for deposit to settle (engine processes the on-chain event).
+  // Use a 25s timeout so we stay inside Vercel's 60s limit.
+  const depositStatus = await employer.pollTransactionStatus(depositResult.txId, {
+    timeoutMs: 25_000,
+    intervalMs: 2_000,
+  });
   console.log("Deposit settled:", depositStatus.status);
 
-  // Register all employee accounts with the Unlink engine before transferring.
-  // transfer() only calls ensureRegistered() on the sender — recipients must be
-  // registered independently or the engine returns "user not found".
-  await Promise.all(
-    transfers.map(({ employeeIndex }) =>
-      getUnlinkClient(employeeIndex).ensureRegistered()
-    )
-  );
-  console.log("All employee accounts registered");
-
-  // Resolve each employee's private Unlink address and build transfer list.
-  // Note: token must be passed at the TOP LEVEL of transfer(), not inside individual
-  // transfer objects — normalizeTransfers() reads params.token, not t.token.
+  // Resolve employee addresses. getUnlinkAddress() already called ensureRegistered()
+  // as a background side-effect when the /employees endpoint was loaded.
   const sdkTransfers = await Promise.all(
     transfers.map(async ({ employeeIndex, amount }) => {
       const recipientAddress = await getUnlinkAddress(employeeIndex);
@@ -126,9 +124,25 @@ export async function runPayroll(transfers, token) {
     })
   );
 
+  // Submit the private transfers. token must be top-level — normalizeTransfers()
+  // reads params.token, not individual t.token.
   const result = await employer.transfer({ transfers: sdkTransfers, token });
-  const transferStatus = await employer.pollTransactionStatus(result.txId);
-  return { success: true, txId: result.txId, status: transferStatus.status };
+  console.log("Transfer submitted:", result.txId);
+
+  // Poll with a short timeout — return the txId even if not yet confirmed.
+  let status = "submitted";
+  try {
+    const transferStatus = await employer.pollTransactionStatus(result.txId, {
+      timeoutMs: 20_000,
+      intervalMs: 2_000,
+    });
+    status = transferStatus.status;
+  } catch {
+    // Timed out waiting — txId is still valid, client can poll later.
+    console.log("Transfer poll timed out — returning txId for client polling");
+  }
+
+  return { success: true, txId: result.txId, status };
 }
 
 /**

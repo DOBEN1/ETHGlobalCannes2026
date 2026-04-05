@@ -40,18 +40,26 @@ router.get("/me", async (req, res) => {
 router.get("/balance", async (req, res) => {
   const employee = getAuthenticatedEmployee(req);
   if (!employee) return res.status(401).json({ error: "Unauthorized" });
-
-  const balances = await getBalance(employee.unlinkIndex);
-  res.json(balances);
+  try {
+    const balances = await getBalance(employee.unlinkIndex);
+    res.json(balances);
+  } catch (err) {
+    console.error("balance error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // GET /api/employee/transactions
 router.get("/transactions", async (req, res) => {
   const employee = getAuthenticatedEmployee(req);
   if (!employee) return res.status(401).json({ error: "Unauthorized" });
-
-  const transactions = await getTransactions(employee.unlinkIndex);
-  res.json(transactions);
+  try {
+    const transactions = await getTransactions(employee.unlinkIndex);
+    res.json(transactions);
+  } catch (err) {
+    console.error("transactions error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // POST /api/employee/withdraw
@@ -61,24 +69,21 @@ router.post("/withdraw", async (req, res) => {
 
   const {
     recipientEvmAddress,
-    token = "0xC1a5D4E99BB224713dd179eA9CA2Fa6600706210", // 0x7501de8ea37a21e20e6e65947d2ecab0e9f061a7 unlink token
-    // token = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    token = "0xC1a5D4E99BB224713dd179eA9CA2Fa6600706210",
     amount,
   } = req.body;
 
   if (!recipientEvmAddress || !amount) {
-    return res
-      .status(400)
-      .json({ error: "recipientEvmAddress and amount are required" });
+    return res.status(400).json({ error: "recipientEvmAddress and amount are required" });
   }
 
-  const result = await withdraw(
-    employee.unlinkIndex,
-    recipientEvmAddress,
-    token,
-    amount
-  );
-  res.json(result);
+  try {
+    const result = await withdraw(employee.unlinkIndex, recipientEvmAddress, token, amount);
+    res.json(result);
+  } catch (err) {
+    console.error("withdraw error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 export default router;
