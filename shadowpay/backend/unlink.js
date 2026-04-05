@@ -103,6 +103,16 @@ export async function runPayroll(transfers, token) {
   const depositStatus = await employer.pollTransactionStatus(depositResult.txId);
   console.log("Deposit settled:", depositStatus.status);
 
+  // Register all employee accounts with the Unlink engine before transferring.
+  // transfer() only calls ensureRegistered() on the sender — recipients must be
+  // registered independently or the engine returns "user not found".
+  await Promise.all(
+    transfers.map(({ employeeIndex }) =>
+      getUnlinkClient(employeeIndex).ensureRegistered()
+    )
+  );
+  console.log("All employee accounts registered");
+
   // Resolve each employee's private Unlink address and build transfer list.
   // Note: token must be passed at the TOP LEVEL of transfer(), not inside individual
   // transfer objects — normalizeTransfers() reads params.token, not t.token.
