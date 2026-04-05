@@ -55,6 +55,13 @@ router.get("/transactions", async (req, res) => {
   if (!employee) return res.status(401).json({ error: "Unauthorized" });
   try {
     const transactions = await getTransactions(employee.unlinkIndex);
+    // Log the raw first transaction so we can see actual field names in Vercel logs
+    if (Array.isArray(transactions) && transactions.length > 0) {
+      console.log("tx[0] raw keys:", Object.keys(transactions[0]));
+      console.log("tx[0] sample:", JSON.stringify(transactions[0]));
+    } else {
+      console.log("transactions: empty for index", employee.unlinkIndex);
+    }
     res.json(transactions);
   } catch (err) {
     console.error("transactions error:", err.message);

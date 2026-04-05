@@ -289,13 +289,21 @@ async function fetchEmployees() {
   }
 }
 
-async function fetchHistory() {
+async function fetchHistory({ retry = true } = {}) {
   loadingHistory.value = true;
   try {
     const res = await fetch("/api/employer/payroll-history", {
       headers: auth.employerHeaders(),
     });
-    if (res.ok) payrollRuns.value = await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      payrollRuns.value = Array.isArray(data) ? data : [];
+      // Retry once after 3s if empty — engine registration may not have
+      // propagated yet on a fresh serverless cold start.
+      if (payrollRuns.value.length === 0 && retry) {
+        setTimeout(() => fetchHistory({ retry: false }), 3000);
+      }
+    }
   } finally {
     loadingHistory.value = false;
   }

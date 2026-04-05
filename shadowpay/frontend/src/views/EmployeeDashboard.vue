@@ -95,11 +95,9 @@
                 class="px-4 py-3 flex items-center justify-between hover:bg-gray-800/30"
               >
                 <div class="flex items-center gap-3">
-                  <span class="text-lg">
-                    {{ tx.type === "deposit" ? "⬇️" : tx.type === "withdraw" ? "⬆️" : "↗️" }}
-                  </span>
+                  <span class="text-lg">{{ txIcon(tx) }}</span>
                   <div>
-                    <p class="text-sm font-medium text-white capitalize">{{ tx.type }}</p>
+                    <p class="text-sm font-medium text-white capitalize">{{ txLabel(tx) }}</p>
                     <p class="text-xs text-gray-500">{{ formatTxDate(tx) }}</p>
                   </div>
                 </div>
@@ -239,13 +237,21 @@ async function fetchBalance() {
   }
 }
 
-async function fetchTransactions() {
+async function fetchTransactions({ retry = true } = {}) {
   loadingTxs.value = true;
   try {
     const res = await fetch("/api/employee/transactions", {
       headers: auth.employeeHeaders(),
     });
-    if (res.ok) transactions.value = await res.json();
+    if (res.ok) {
+      const data = await res.json();
+      transactions.value = Array.isArray(data) ? data : [];
+      // Race condition: ensureRegistered() just completed but the engine may not
+      // have propagated the account data yet. Retry once after 3s if empty.
+      if (transactions.value.length === 0 && retry) {
+        setTimeout(() => fetchTransactions({ retry: false }), 3000);
+      }
+    }
   } finally {
     loadingTxs.value = false;
   }
@@ -281,9 +287,24 @@ async function doWithdraw() {
   }
 }
 
+/** Resolve tx type across possible Unlink API field names. */
+function txType(tx) {
+  return tx.type ?? tx.kind ?? tx.operation_type ?? tx.tx_type ?? "";
+}
+function txIcon(tx) {
+  const t = txType(tx).toLowerCase();
+  if (t.includes("deposit")) return "⬇️";
+  if (t.includes("withdraw")) return "⬆️";
+  return "↗️"; // incoming salary transfer
+}
+function txLabel(tx) {
+  const t = txType(tx);
+  return t || "transfer";
+}
+
 /** Parse a transaction date regardless of field name or unix-vs-ISO format. */
 function formatTxDate(tx) {
-  const raw = tx.created_at ?? tx.createdAt ?? tx.timestamp ?? tx.created;
+  const raw = tx.created_at ?? tx.createdAt ?? tx.timestamp ?? tx.created ?? tx.submitted_at;
   if (!raw) return "—";
   const d = typeof raw === "number" ? new Date(raw * 1000) : new Date(raw);
   return isNaN(d.getTime()) ? "—" : d.toLocaleString();
