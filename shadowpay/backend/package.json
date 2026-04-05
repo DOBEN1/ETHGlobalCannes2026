@@ -4,9 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "node index.js",
-    "dev": "node --watch index.js",
-    "postinstall": "node scripts/patch-blakejs.mjs",
-    "vercel-build": "cp -r node_modules/@zk-kit/eddsa-poseidon/dist ./dist/node_modules/@zk-kit/eddsa-poseidon/"
+    "dev": "node --watch index.js"
   },
   "dependencies": {
     "@unlink-xyz/sdk": "0.1.0-canary.1",
