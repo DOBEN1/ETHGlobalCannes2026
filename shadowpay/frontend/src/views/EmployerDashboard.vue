@@ -160,7 +160,7 @@
                   </p>
                   <p class="text-xs text-gray-500 mt-0.5">
                     <span v-if="run.employeeCount !== '—'">{{ run.employeeCount }} employees · </span>
-                    {{ run.date ? new Date(run.date).toLocaleDateString() : '' }}
+                    {{ formatRunDate(run) }}
                   </p>
                 </div>
                 <span
@@ -349,6 +349,13 @@ async function addEmployee() {
   } finally {
     addingEmployee.value = false;
   }
+}
+
+function formatRunDate(run) {
+  const raw = run.date ?? run.created_at ?? run.timestamp;
+  if (!raw) return "—";
+  const d = typeof raw === "number" ? new Date(raw * 1000) : new Date(raw);
+  return isNaN(d.getTime()) ? "—" : d.toLocaleDateString();
 }
 
 function logout() {

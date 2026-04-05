@@ -96,13 +96,11 @@
               >
                 <div class="flex items-center gap-3">
                   <span class="text-lg">
-                    {{ tx.type === "deposit" ? "⬇️" : tx.type === "withdraw" ? "⬆️" : "↔️" }}
+                    {{ tx.type === "deposit" ? "⬇️" : tx.type === "withdraw" ? "⬆️" : "↗️" }}
                   </span>
                   <div>
                     <p class="text-sm font-medium text-white capitalize">{{ tx.type }}</p>
-                    <p class="text-xs text-gray-500">
-                      {{ new Date(tx.created_at).toLocaleString() }}
-                    </p>
+                    <p class="text-xs text-gray-500">{{ formatTxDate(tx) }}</p>
                   </div>
                 </div>
                 <span
@@ -281,6 +279,14 @@ async function doWithdraw() {
   } finally {
     withdrawing.value = false;
   }
+}
+
+/** Parse a transaction date regardless of field name or unix-vs-ISO format. */
+function formatTxDate(tx) {
+  const raw = tx.created_at ?? tx.createdAt ?? tx.timestamp ?? tx.created;
+  if (!raw) return "—";
+  const d = typeof raw === "number" ? new Date(raw * 1000) : new Date(raw);
+  return isNaN(d.getTime()) ? "—" : d.toLocaleString();
 }
 
 function logout() {

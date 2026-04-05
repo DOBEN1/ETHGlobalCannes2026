@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   getEmployees,
   addEmployee,
+  getPayrollRuns,
   addPayrollRun,
 } from "../store.js";
 import { getUnlinkAddress, runPayroll, getTransactions } from "../unlink.js";
@@ -90,25 +91,32 @@ router.post("/payroll", async (req, res) => {
 });
 
 // GET /api/employer/payroll-history
-// Fetch from the Unlink engine (employer index 0) so history persists across
-// serverless cold starts instead of relying on the ephemeral in-memory store.
+// Combines in-memory runs (current session, rich metadata) with Unlink engine
+// transactions (persistent across cold starts). In-memory entries take priority
+// for deduplication so their richer fields (employeeCount, totalAmount) are kept.
 router.get("/payroll-history", async (req, res) => {
+  const memoryRuns = getPayrollRuns();
+  const memoryIds = new Set(memoryRuns.map((r) => r.id));
+
+  let engineRuns = [];
   try {
     const txs = await getTransactions(0);
-    // Map Unlink transactions to a payroll-run-like shape the UI expects
-    const runs = (Array.isArray(txs) ? txs : []).map((tx) => ({
-      id: tx.id,
-      date: tx.created_at,
-      status: tx.status,
-      type: tx.type,
-      totalAmount: tx.amount ?? "—",
-      employeeCount: "—",
-    }));
-    res.json(runs);
+    engineRuns = (Array.isArray(txs) ? txs : [])
+      .filter((tx) => !memoryIds.has(tx.id)) // skip what's already in memory
+      .map((tx) => ({
+        id: tx.id,
+        // Engine may use created_at (ISO string) or timestamp (unix seconds)
+        date: tx.created_at ?? (tx.timestamp ? new Date(tx.timestamp * 1000).toISOString() : null),
+        status: tx.status,
+        type: tx.type,
+        totalAmount: tx.amount ?? "—",
+        employeeCount: "—",
+      }));
   } catch (err) {
-    console.error("payroll-history error:", err.message);
-    res.json([]); // return empty list rather than crashing the UI
+    console.error("payroll-history engine fetch failed:", err.message);
   }
+
+  res.json([...memoryRuns, ...engineRuns]);
 });
 
 export default router;
