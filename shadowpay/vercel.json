@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "buildCommand": "cd shadowpay/frontend && npm install && npm run build",
+  "outputDirectory": "shadowpay/frontend/dist",
+  "installCommand": "npm install",
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30,
+      "includeFiles": [
+        "shadowpay/backend/**",
+        "node_modules/@zk-kit/**",
+        "node_modules/blakejs/**",
+        "node_modules/@unlink-xyz/**"
+      ]
+    }
+  },
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index" },
+    { "source": "/((?!api).*)", "destination": "/index.html" }
+  ]
+}
