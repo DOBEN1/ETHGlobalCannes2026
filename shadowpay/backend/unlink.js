@@ -150,9 +150,11 @@ export async function runPayroll(transfers, token) {
  * Ensures the account is registered before querying so the engine knows about it.
  */
 export async function getBalance(accountIndex, token) {
+  console.log("check balances for token")
+  console.log(token)
   const client = getUnlinkClient(accountIndex);
   await client.ensureRegistered();
-  return client.getBalances(token ? { token } : {});
+  return client.getBalances({ token });
 }
 
 /**

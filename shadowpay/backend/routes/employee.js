@@ -43,6 +43,7 @@ router.get("/balance", async (req, res) => {
   try {
     const balances = await getBalance(employee.unlinkIndex, "0xC1a5D4E99BB224713dd179eA9CA2Fa6600706210");
     res.json(balances);
+    console.log(balances)
   } catch (err) {
     console.error("balance error:", err.message);
     res.status(500).json({ error: err.message });

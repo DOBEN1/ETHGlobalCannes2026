@@ -158,6 +158,7 @@ const withdrawing = ref(false);
 const withdrawStatus = ref(null);
 
 const totalBalance = computed(() => {
+  console.log(balances)
   if (!balances.value.length) return null;
   return balances.value.reduce(
     (sum, b) => sum + Number(b.amount) ,
