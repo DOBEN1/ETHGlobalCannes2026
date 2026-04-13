@@ -2,11 +2,11 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Skills &amp; Experience</title>
+  <title>Skills Table</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 40px;
+      margin: 20px;
     }
     table {
       border-collapse: collapse;
@@ -15,28 +15,26 @@
     th {
       background-color: #2C3E50;
       color: #FFFFFF;
-      font-size: 13pt;
-      padding: 10px 14px;
+      font-size: 11pt;
+      font-weight: bold;
+      padding: 8px 12px;
       text-align: left;
+      border: 1px solid #2C3E50;
     }
     td {
-      padding: 8px 14px;
+      padding: 6px 12px;
       vertical-align: top;
       font-size: 11pt;
-      border: 1px solid #BDC3C7;
+      border: 1px solid #AAAAAA;
     }
-    td:first-child {
+    td.cat {
       font-weight: bold;
-      background-color: #EBF5FB;
+      background-color: #D6EAF8;
       white-space: nowrap;
-      width: 220px;
+      width: 200px;
     }
-    tr:nth-child(even) td:last-child {
-      background-color: #F8F9FA;
-    }
-    tr:nth-child(odd) td:last-child {
-      background-color: #FFFFFF;
-    }
+    tr.even td.val { background-color: #F2F3F4; }
+    tr.odd  td.val { background-color: #FFFFFF;  }
   </style>
 </head>
 <body>
@@ -48,57 +46,57 @@
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td>Languages</td>
-      <td>Solidity (4+ years) &#9642; Rust (4+ years) &#9642; TypeScript/JavaScript (6+ years) &#9642; Haskell (1+ years)</td>
+    <tr class="odd">
+      <td class="cat">Languages</td>
+      <td class="val">Solidity (4+ years) &#9642; Rust (4+ years) &#9642; TypeScript/JavaScript (6+ years) &#9642; Haskell (1+ years)</td>
     </tr>
-    <tr>
-      <td>Web3</td>
-      <td>Blockchain Protocols &#9642; Blockchain SDKs/libraries (Rust and TypeScript/JavaScript) &#9642; WalletConnect &#9642; Ledger app development (sideloading)</td>
+    <tr class="even">
+      <td class="cat">Web3</td>
+      <td class="val">Blockchain Protocols &#9642; Blockchain SDKs/libraries (Rust and TypeScript/JavaScript) &#9642; WalletConnect &#9642; Ledger app development (sideloading)</td>
     </tr>
-    <tr>
-      <td>Smart Contract Protocols</td>
-      <td>Bridges &#9642; DEXs &#9642; NFT Marketplaces &#9642; Smart Contract Staking &#9642; Oracles</td>
+    <tr class="odd">
+      <td class="cat">Smart Contract Protocols</td>
+      <td class="val">Bridges &#9642; DEXs &#9642; NFT Marketplaces &#9642; Smart Contract Staking &#9642; Oracles</td>
     </tr>
-    <tr>
-      <td>ZK (zero-knowledge)</td>
-      <td>Concordium&#8217;s ZK verifier/proofing systems</td>
+    <tr class="even">
+      <td class="cat">ZK (zero-knowledge)</td>
+      <td class="val">Concordium's ZK verifier/proofing systems</td>
     </tr>
-    <tr>
-      <td>Security</td>
-      <td>Code Reviews &#9642; Smart Contract Auditing &#9642; Yubico Keys</td>
+    <tr class="odd">
+      <td class="cat">Security</td>
+      <td class="val">Code Reviews &#9642; Smart Contract Auditing &#9642; Yubico Keys</td>
     </tr>
-    <tr>
-      <td>Non-EVM Chains</td>
-      <td>Concordium &#9642; Hyperledger Fabric</td>
+    <tr class="even">
+      <td class="cat">Non-EVM Chains</td>
+      <td class="val">Concordium &#9642; Hyperledger Fabric</td>
     </tr>
-    <tr>
-      <td>EVM Chain Tools</td>
-      <td>Hardhat &#9642; Foundry</td>
+    <tr class="odd">
+      <td class="cat">EVM Chain Tools</td>
+      <td class="val">Hardhat &#9642; Foundry</td>
     </tr>
-    <tr>
-      <td>Software Architecture</td>
-      <td>Authored architectural decision records (ADRs) &#9642; Designed key architectural components</td>
+    <tr class="even">
+      <td class="cat">Software Architecture</td>
+      <td class="val">Authored architectural decision records (ADRs) &#9642; Designed key architectural components</td>
     </tr>
-    <tr>
-      <td>Blockchain Indexers</td>
-      <td>GraphQL &#9642; PostgreSQL &#9642; Database migrations &#9642; PGAdmin4 &#9642; cargo sqlx</td>
+    <tr class="odd">
+      <td class="cat">Blockchain Indexers</td>
+      <td class="val">GraphQL &#9642; PostgreSQL &#9642; Database migrations &#9642; PGAdmin4 &#9642; cargo sqlx</td>
     </tr>
-    <tr>
-      <td>Web3 Operational Keys</td>
-      <td>Involved in smart contract protocol upgrades on mainnets &#9642; Familiar with Gnosis Multi-Sig Wallets for key management &#9642; Hardware Wallets &#9642; Submitted blockchain protocol upgrade transactions on-chain (Concordium)</td>
+    <tr class="even">
+      <td class="cat">Web3 Operational Keys</td>
+      <td class="val">Involved in smart contract protocol upgrades on mainnets &#9642; Gnosis Multi-Sig Wallets for key management &#9642; Hardware Wallets &#9642; Submitted blockchain protocol upgrade transactions on-chain (Concordium)</td>
     </tr>
-    <tr>
-      <td>CI/CD Tools</td>
-      <td>Github Actions &#9642; Gitlab CI/CD &#9642; Jenkins</td>
+    <tr class="odd">
+      <td class="cat">CI/CD Tools</td>
+      <td class="val">Github Actions &#9642; Gitlab CI/CD &#9642; Jenkins</td>
     </tr>
-    <tr>
-      <td>Frontend Frameworks</td>
-      <td>React &#9642; Next.js</td>
+    <tr class="even">
+      <td class="cat">Frontend Frameworks</td>
+      <td class="val">React &#9642; Next.js</td>
     </tr>
-    <tr>
-      <td>Dev Ops</td>
-      <td>Docker &#9642; AWS &#9642; Vercel &#9642; Prometheus &#9642; Grafana</td>
+    <tr class="odd">
+      <td class="cat">Dev Ops</td>
+      <td class="val">Docker &#9642; AWS &#9642; Vercel &#9642; Prometheus &#9642; Grafana</td>
     </tr>
   </tbody>
 </table>
